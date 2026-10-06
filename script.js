@@ -13,7 +13,7 @@ function normalizeSpaces(t){return t.replace(/[ \t\u3000]+/g," ").replace(/^[ ]+
 function normalizeLineBreaks(t){return t.replace(/\r\n?/g,"\n").replace(/\n{3,}/g,"\n\n").trim()}
 function normalizeWidth(t){return t.replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xfee0)).replace(/　/g," ")}
 function normalizePunctuation(t){return t.replace(/[,.!?:;]/g,c=>PUNCTUATION_MAP[c]||c)}
-function normalizeQuotes(t){let r=t.replace(/[“”]/g,c=>c==="“"?"「":"」").replace(/「{2}/g,"「").replace(/」{2}/g,"」"),open=true;return r.replace(/"/g,()=>open?"「":"」").replace(/(?<![\p{L}\p{N}])'([^']+)'/gu,"「$1」")}
+function normalizeQuotes(t){let open=true;return t.replace(/[“”]/g,c=>c==="“"?"「":"」").replace(/"/g,()=>{const q=open?"「":"」";open=!open;return q}).replace(/(?<![\p{L}\p{N}])'([^']+)'/gu,"「$1」")}
 function formatBullets(t){return t.replace(/^[ \t]*[-*+・]+[ \t]*/gm,"・").replace(/^[ \t]*[•●○][ \t]*/gm,"・")}
 const actions={spaces:{label:"余分な空白を整理しました",fn:normalizeSpaces},linebreaks:{label:"連続した改行を整理しました",fn:normalizeLineBreaks},width:{label:"全角・半角を整理しました",fn:normalizeWidth},punctuation:{label:"句読点を統一しました",fn:normalizePunctuation},quotes:{label:"括弧・引用符を整理しました",fn:normalizeQuotes},trim:{label:"文章の前後をトリミングしました",fn:t=>t.trim()}};
 document.querySelectorAll(".tool-button").forEach(b=>b.addEventListener("click",()=>{const a=actions[b.dataset.action];if(a)setText(a.fn(input.value),a.label)}));
