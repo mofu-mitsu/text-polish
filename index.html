@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="文章を整えて文字数をチェックできる無料の文章整形・文字数カウントツール。SNS投稿やブログ、応募文の文字数確認に。">
+<meta name="theme-color" content="#f7f5ff">
+<title>Text Polish — 文章整形＆文字数カウント</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span class="brand-mark">T</span><div><h1>Text Polish</h1><p>文章を整えて、数えて、仕上げる。</p></div></div>
+  <div class="header-actions"><button class="ghost-button" id="sampleButton" type="button">サンプル</button><button class="ghost-button" id="clearButton" type="button">クリア</button></div>
+</header>
+<main class="app-shell">
+<section class="hero"><div><span class="eyebrow">TEXT WORKBENCH</span><h2>書いた文章を、<span>投稿できる状態</span>まで。</h2><p>文字数を確認しながら、空白・改行・表記をまとめて整えられます。</p></div><div class="hero-badge"><strong id="heroCount">0</strong><span>characters</span></div></section>
+<section class="workspace">
+  <div class="editor-panel panel">
+    <div class="panel-heading"><div><span class="panel-kicker">INPUT</span><h3>文章</h3></div><span class="live-status"><i></i> LIVE</span></div>
+    <textarea id="textInput" spellcheck="false" placeholder="ここに文章を入力してください…&#10;&#10;入力すると文字数と各種カウントがリアルタイムで更新されます。"></textarea>
+    <div class="editor-footer"><span id="lineInfo">1行</span><span id="wordInfo">0文字</span></div>
+  </div>
+  <aside class="stats-panel panel">
+    <div class="panel-heading"><div><span class="panel-kicker">ANALYSIS</span><h3>文字数チェック</h3></div></div>
+    <div class="target-box">
+      <div class="target-top"><label for="targetCount">目標文字数</label><div class="target-input-wrap"><input id="targetCount" type="number" min="0" max="999999" value="140" inputmode="numeric"><span>文字</span></div></div>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-meta"><span id="progressText">あと 140 文字</span><span id="progressPercent">0%</span></div>
+    </div>
+    <div class="primary-stat"><span>文字数</span><strong id="charCount">0</strong></div>
+    <div class="stat-grid">
+      <div class="stat"><span>URL除外</span><strong id="urlExcludedCount">0</strong></div><div class="stat"><span>改行</span><strong id="lineBreakCount">0</strong></div>
+      <div class="stat"><span>空白</span><strong id="spaceCount">0</strong></div><div class="stat"><span>日本語</span><strong id="japaneseCount">0</strong></div>
+      <div class="stat"><span>英字</span><strong id="alphaCount">0</strong></div><div class="stat"><span>数字</span><strong id="numberCount">0</strong></div>
+      <div class="stat"><span>記号</span><strong id="symbolCount">0</strong></div><div class="stat"><span>絵文字</span><strong id="emojiCount">0</strong></div>
+    </div>
+  </aside>
+</section>
+<section class="tools-section">
+  <div class="section-heading"><div><span class="panel-kicker">POLISH</span><h3>文章を整える</h3></div><p>選んだ処理を一括適用できます。</p></div>
+  <div class="tool-grid">
+    <button class="tool-button" data-action="spaces" type="button"><span class="tool-icon">↔</span><span><b>余分な空白を削除</b><small>連続スペース・行頭末を整理</small></span></button>
+    <button class="tool-button" data-action="linebreaks" type="button"><span class="tool-icon">↵</span><span><b>改行を整理</b><small>3行以上の連続改行を2行に</small></span></button>
+    <button class="tool-button" data-action="width" type="button"><span class="tool-icon">Ａ</span><span><b>全角・半角を統一</b><small>英数字・記号を半角へ</small></span></button>
+    <button class="tool-button" data-action="punctuation" type="button"><span class="tool-icon">。</span><span><b>句読点を統一</b><small>「, .」を「、。」へ</small></span></button>
+    <button class="tool-button" data-action="quotes" type="button"><span class="tool-icon">“”</span><span><b>括弧・引用符を統一</b><small>引用符を日本語向けに</small></span></button>
+    <button class="tool-button" data-action="trim" type="button"><span class="tool-icon">⌫</span><span><b>前後をトリミング</b><small>文章の先頭・末尾の空白を削除</small></span></button>
+  </div>
+  <div class="action-row"><button class="secondary-button" id="extractUrls" type="button">🔗 URLを抽出</button><button class="secondary-button" id="formatBullets" type="button">• 箇条書きを整える</button><button class="primary-button" id="copyButton" type="button">コピーする</button></div>
+  <div class="message" id="message" role="status" aria-live="polite"></div>
+</section>
+<section class="details-section"><details><summary>カウント仕様について</summary><ul><li>文字数はJavaScriptのUnicodeコードポイント単位で数えます。</li><li>URL除外は http / https / www から始まるURLを除いて数えます。</li><li>絵文字はUnicodeの絵文字シーケンスをできるだけ1単位として数えます。</li><li>改行は改行文字の数です。空白にはスペース・タブなどを含みます。</li></ul></details></section>
+</main>
+<footer class="site-footer"><span>Text Polish</span><span>入力内容はブラウザ内だけで処理されます。</span></footer>
+<script src="script.js"></script>
+</body>
+</html>
