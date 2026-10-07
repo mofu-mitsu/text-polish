@@ -62,12 +62,39 @@
   gtag('js', new Date());
   gtag('config', 'G-GNTX973GET');
 </script>
+
+<!-- Breadcrumb structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://mofu-mitsu.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Text Polish",
+      "item": "https://mofu-mitsu.github.io/text-polish/"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <header class="site-header">
   <div class="brand"><span class="brand-mark">T</span><div><h1>Text Polish</h1><p>文章を整えて、数えて、仕上げる。</p></div></div>
   <div class="header-actions"><button class="icon-button" id="undoButton" type="button" title="元に戻す" aria-label="元に戻す" disabled>↶</button><button class="icon-button" id="redoButton" type="button" title="やり直す" aria-label="やり直す" disabled>↷</button><button class="ghost-button" id="sampleButton" type="button">サンプル</button><button class="ghost-button" id="clearButton" type="button">クリア</button></div>
 </header>
+<nav class="breadcrumb" aria-label="パンくずリスト">
+  <a href="https://mofu-mitsu.github.io/">ホーム</a>
+  <span aria-hidden="true">›</span>
+  <span aria-current="page">Text Polish</span>
+</nav>
 <div class="quick-toolbar" id="quickToolbar" aria-label="作業ツール">
   <button class="quick-drag" id="quickDrag" type="button" aria-label="ツールバーを移動" title="ドラッグして移動"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h2v2H8V5Zm6 0h2v2h-2V5ZM8 11h2v2H8v-2Zm6 0h2v2h-2v-2ZM8 17h2v2H8v-2Zm6 0h2v2h-2v-2Z"/></svg></button>
   <button class="quick-tab active" data-jump="editor-panel" data-detail="文章入力・文字数確認。まずここから作業します。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5V20h2.5L18.7 7.8l-2.5-2.5L4 17.5Zm15.4-11.4a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-1.2 1.2 2.5 2.5 1.2-1.2Z"/></svg><span>編集</span></button>
