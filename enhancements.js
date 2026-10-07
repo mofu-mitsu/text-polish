@@ -23,11 +23,9 @@
   }
 
   const controls = $('.thread-controls', thread);
-  if (controls && !$('#insertDivider')) {
-    const b = document.createElement('button');
-    b.id = 'insertDivider'; b.type = 'button'; b.className = 'secondary-button';
-    b.textContent = '分割線を挿入'; b.title = 'カーソル位置に「ーーーー」を入れます';
-    controls.appendChild(b);
+  const insertDivider = $('#insertDivider');
+  if (controls && insertDivider && !insertDivider.dataset.bound) {
+    const b = insertDivider; b.dataset.bound = '1';
     b.addEventListener('click', () => {
       const start = input.selectionStart, end = input.selectionEnd, value = input.value;
       const before = value.slice(0, start), after = value.slice(end);
@@ -41,11 +39,9 @@
     });
   }
 
-  if (controls && !$('#splitDividerButton')) {
-    const b = document.createElement('button');
-    b.id = 'splitDividerButton'; b.type = 'button'; b.className = 'secondary-button';
-    b.textContent = '分割線で投稿を作る'; b.title = 'ーーーー の行を投稿境界として分割します';
-    controls.appendChild(b);
+  const splitDividerButton = $('#splitDividerButton');
+  if (controls && splitDividerButton && !splitDividerButton.dataset.bound) {
+    const b = splitDividerButton; b.dataset.bound = '1';
     b.addEventListener('click', () => {
       if (!/^\s*ー{2,}\s*$/mu.test(input.value)) return window.showMessage?.('分割線「ーーーー」がありません');
       const original = input.value;
@@ -63,11 +59,9 @@
   }
 
   const title = $('.option-title', thread);
-  if (title && !$('#threadClear')) {
-    const b = document.createElement('button');
-    b.id = 'threadClear'; b.type = 'button'; b.className = 'thread-clear secondary-button';
-    b.textContent = 'クリア'; b.title = 'SNS投稿エディターをクリアします';
-    title.appendChild(b);
+  const threadClear = $('#threadClear');
+  if (title && threadClear && !threadClear.dataset.bound) {
+    const b = threadClear; b.dataset.bound = '1';
     b.addEventListener('click', () => {
       const preview = $('#threadPreview');
       const remove = () => { const del = $('.thread-delete', preview); if (del) { del.click(); requestAnimationFrame(remove); return; } $('#addThreadPost')?.click(); window.showMessage?.('SNS投稿エディターをクリアしました'); };
@@ -80,11 +74,10 @@
     if (preview && !$('.thread-edit', preview)) $('#addThreadPost')?.click();
   });
 
-  if (controls && !$('#threadLiveSync')) {
-    const label = document.createElement('label');
-    label.className = 'check-row thread-live-sync';
-    label.innerHTML = '<input id="threadLiveSync" type="checkbox"> 入力欄とPOST 1を同期';
-    controls.appendChild(label);
+  const threadLiveSync = $('#threadLiveSync');
+  if (controls && threadLiveSync && !threadLiveSync.dataset.bound) {
+    const label = threadLiveSync.closest('label') || document.createElement('label');
+    label.dataset.bound = '1';
     const sync = () => {
       if (!$('#threadLiveSync')?.checked) return;
       const first = $('.thread-edit', $('#threadPreview'));
