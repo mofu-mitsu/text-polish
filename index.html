@@ -7,6 +7,15 @@
 <meta name="theme-color" content="#f7f5ff">
 <title>Text Polish — 文章整形＆文字数カウント</title>
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GNTX973GET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GNTX973GET');
+</script>
 </head>
 <body>
 <header class="site-header">
@@ -55,9 +64,9 @@
     <label>1投稿 <input id="splitLimit" type="number" min="1" max="25000" value="140"> 文字</label>
     <label class="check-row"><input id="splitPreferLines" type="checkbox" checked> 文の途中で切らない</label>
     <label class="thread-method">分割方法 <select id="splitMethod"><option value="divider" selected>分割線</option><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label><button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
-    <label class="check-row thread-live-sync"><input id="threadLiveSync" type="checkbox"> 入力欄とPOST 1を同期</label>
+    <label class="check-row thread-live-sync"><input id="threadLiveSync" type="checkbox"> 入力欄とSNS投稿エディターを同期</label>
   </div>
-  <div class="thread-help">基本は「ーーーー」のような分割線で投稿境界を決め、必要なら自動分割も使えます。POSTごとに編集・コピー・削除・並べ替えができます。</div>
+  <div class="thread-help">基本は「__________________________________」の分割線で投稿境界を決め、必要なら自動分割も使えます。POSTごとに編集・コピー・削除・並べ替えができます。</div>
   <div class="thread-preview" id="threadPreview"></div>
   <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">入力欄に反映</button></div>
 </div>
