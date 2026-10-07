@@ -22,9 +22,12 @@
     if(!$('#threadLiveSync')?.checked||syncing)return;
     syncing=true;
     try{
-      if(typeof window.splitText==='function'&&typeof window.renderThreadEditor==='function'){
-        window.threadParts=window.splitText(input.value,Math.max(1,Number($('#splitLimit').value)||140),$('#splitPreferLines').checked,'divider');
-        window.renderThreadEditor();
+      if(typeof window.createThreadPosts==='function'){
+        const method=$('#splitMethod');
+        const previous=method?.value;
+        if(method)method.value='divider';
+        window.createThreadPosts();
+        if(method&&previous)method.value=previous;
       }
     }finally{syncing=false}
   };
