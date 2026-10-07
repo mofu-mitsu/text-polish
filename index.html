@@ -18,7 +18,7 @@
   <button class="quick-tab active" data-jump="editor-panel" data-detail="文章入力・文字数確認。まずここから作業します。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5V20h2.5L18.7 7.8l-2.5-2.5L4 17.5Zm15.4-11.4a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-1.2 1.2 2.5 2.5 1.2-1.2Z"/></svg><span>編集</span></button>
   <button class="quick-tab" data-jump="selection-tools" data-detail="選択した部分だけを加工。変換・整形・置換を範囲限定で実行できます。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm0 14h14v2H5v-2Zm0-7h14v2H5v-2Z"/></svg><span>範囲</span></button>
   <button class="quick-tab" data-jump="quick-tools" data-detail="空白・改行・句読点・箇条書きなど文章の基本整形。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-8 12h6l-1 8 8-12h-6l1-8Z"/></svg><span>整形</span></button>
-  <button class="quick-tab" data-jump="thread-tools" data-detail="SNS投稿を分割して、POSTごとに編集・コピーできます。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v2H7V4Zm-2 5h14v2H5V9Zm2 5h10v2H7v-2Zm-2 4h14v2H5v-2Z"/></svg><span>分割</span></button>
+  <button class="quick-tab" id="quickDivider" data-detail="入力欄に分割用の罫線を挿入します。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11h18v2H3v-2Zm0-5h18v2H3V6Zm0 10h18v2H3v-2Z"/></svg><span>分割</span></button>
   <button class="quick-tab" data-jump="conversion-tools" data-detail="かな・英字・数字・記号の変換と検索置換。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7v3H8.5v11h-3V8H4V5Zm9 0h7v3h-2.5v11h-3V8H13V5Z"/></svg><span>変換</span></button>
   <button class="quick-tab" data-jump="file-tools" data-detail="TXTなどの読み込み・保存。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h9l5 5v11H5V4Zm8 1.5V10h4.5L13 5.5ZM8 14h8v1.5H8V14Zm0 3h8v1.5H8V17Z"/></svg><span>ファイル</span></button>
   <button class="quick-collapse" id="quickCollapse" type="button" aria-label="ツールバーを折りたたむ" title="折りたたむ">‹</button>
@@ -29,20 +29,20 @@
 <section class="workspace">
   <div class="editor-panel panel" id="editor-panel">
     <div class="panel-heading"><div><span class="panel-kicker">INPUT</span><h3>文章</h3></div><span class="live-status"><i></i> LIVE</span></div>
-    <textarea id="textInput" spellcheck="false" placeholder="ここに文章を入力してください…&#10;&#10;入力すると文字数と各種カウントがリアルタイムで更新されます。"></textarea>
+    <textarea id="textInput" spellcheck="false" placeholder="ここに文章を入力してください…&#10;&#10;入力すると文字数と各種カウントがリアルタイムで更新されます。"></textarea><div class="input-tools"><button class="secondary-button" id="inputDividerButton" type="button">罫線を挿入</button><span>分割線：<code>__________________________________</code></span></div>
     <div class="editor-footer"><span id="lineInfo">1行</span><span id="wordInfo">0文字</span></div>
   </div>
   <aside class="stats-panel panel">
     <div class="panel-heading"><div><span class="panel-kicker">ANALYSIS</span><h3>文字数チェック</h3></div></div>
-    <div class="target-box"><div class="sns-inline-note">SNS投稿の文字数上限は「SNSモード」で設定できます。分割すると、この文章欄のすぐ下でPOSTごとに編集できます。</div>
+    <div class="target-box"><div class="sns-inline-note">SNS投稿の文字数上限は「SNSモード」で設定できます。分割線を入れておけば、その位置を投稿境界にできます。</div>
       <div class="target-top"><label for="targetCount">目標文字数</label><div class="target-input-wrap"><input id="targetCount" type="number" min="0" max="999999" value="140" inputmode="numeric"><span>文字</span></div></div><div class="sns-row"><label for="snsMode">SNSモード</label><select id="snsMode"><option value="">カスタム</option><option value="x">X / 280</option><option value="xjp">X / 日本語目安 140</option><option value="xlong">X Premium / 長文 25,000</option><option value="bluesky">Bluesky / 300</option><option value="instagram">Instagram / 2,200</option><option value="threads">Threads / 500</option></select></div>
       <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
-      <div class="progress-meta"><span id="progressText">あと 140 文字</span><span id="progressPercent">0%</span></div>
+      <div class="divider-count-option"><label class="check-row"><input id="excludeDividerCount" type="checkbox" checked> 罫線を文字数から除外</label></div><div class="progress-meta"><span id="progressText">あと 140 文字</span><span id="progressPercent">0%</span></div>
     </div>
     <div class="primary-stat"><span>文字数</span><strong id="charCount">0</strong></div>
     <div class="stat-grid">
       <div class="stat"><span>改行・空白込み</span><strong id="charCountIncluded">0</strong></div><div class="stat"><span>改行・空白除外</span><strong id="charCountExcluded">0</strong></div>
-      <div class="stat"><span>URL除外</span><strong id="urlExcludedCount">0</strong></div><div class="stat"><span>改行</span><strong id="lineBreakCount">0</strong></div>
+      <div class="stat"><span>URL除外</span><strong id="urlExcludedCount">0</strong></div><div class="stat"><span>罫線除外</span><strong id="dividerExcludedCount">0</strong></div><div class="stat"><span>改行</span><strong id="lineBreakCount">0</strong></div>
       <div class="stat"><span>空白</span><strong id="spaceCount">0</strong></div><div class="stat"><span>日本語</span><strong id="japaneseCount">0</strong></div>
       <div class="stat"><span>英字</span><strong id="alphaCount">0</strong></div><div class="stat"><span>数字</span><strong id="numberCount">0</strong></div>
       <div class="stat"><span>記号</span><strong id="symbolCount">0</strong></div><div class="stat"><span>絵文字</span><strong id="emojiCount">0</strong></div>
@@ -54,15 +54,12 @@
   <div class="thread-controls">
     <label>1投稿 <input id="splitLimit" type="number" min="1" max="25000" value="140"> 文字</label>
     <label class="check-row"><input id="splitPreferLines" type="checkbox" checked> 文の途中で切らない</label>
-    <label class="thread-method">分割方法 <select id="splitMethod"><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label>
-    <button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
-    <button class="secondary-button" id="insertDivider" type="button">分割線を挿入</button>
-    <button class="secondary-button" id="splitDividerButton" type="button">分割線で投稿を作る</button>
+    <label class="thread-method">分割方法 <select id="splitMethod"><option value="divider" selected>分割線</option><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label><button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
     <label class="check-row thread-live-sync"><input id="threadLiveSync" type="checkbox"> 入力欄とPOST 1を同期</label>
   </div>
   <div class="thread-help">基本は「ーーーー」のような分割線で投稿境界を決め、必要なら自動分割も使えます。POSTごとに編集・コピー・削除・並べ替えができます。</div>
   <div class="thread-preview" id="threadPreview"></div>
-  <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">本文に反映</button></div>
+  <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">入力欄に反映</button></div>
 </div>
 <section class="tools-section selection-tools" id="selection-tools">
   <div class="section-heading"><div><span class="panel-kicker">SELECTION</span><h3>範囲選択ツール</h3></div><p>範囲を選ぶと、下の変換・整形もすべて選択部分だけに適用できます。</p></div>
