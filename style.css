@@ -40,3 +40,8 @@
 
 /* Rakuten recommendation widget */
 .affiliate-section{width:min(100%,1180px);margin:42px auto 0;padding:28px 24px 34px;border-top:1px solid var(--line);text-align:center}.affiliate-heading .panel-kicker{display:block;margin-bottom:6px}.affiliate-heading h3{margin:0 0 18px;font-size:1.05rem}.affiliate-widget{min-height:160px;display:flex;justify-content:center;align-items:center;overflow:hidden}.affiliate-widget iframe{width:468px;height:160px;max-width:100%;border:0;display:block}.affiliate-widget iframe{max-width:100%}@media(max-width:600px){.affiliate-section{margin-top:30px;padding:24px 16px 28px}.affiliate-widget{min-height:160px;overflow-x:auto;justify-content:flex-start}}
+
+
+/* Input header actions */
+.input-heading-actions{display:flex;align-items:center;gap:12px}.input-copy-button{border:1px solid var(--line);background:#fff;color:#625e70;border-radius:9px;padding:6px 10px;font-size:.68rem;font-weight:700;transition:.18s}.input-copy-button:hover{border-color:#d5cdf0;background:var(--accent-soft);color:var(--accent-dark)}.input-copy-button:active{transform:translateY(1px)}
+@media(max-width:600px){.input-heading-actions{gap:8px}.input-copy-button{padding:6px 9px}}
