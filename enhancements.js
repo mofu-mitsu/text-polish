@@ -4,6 +4,13 @@
   const thread = $('#thread-tools');
   if (!input || !thread) return;
 
+  const style = document.createElement('style');
+  style.textContent = `
+    .header-help-wrap{position:relative;margin-left:4px}.header-help{width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--accent-dark);display:grid;place-items:center}.header-help svg{width:18px;height:18px}.header-help-panel{position:absolute;top:40px;right:0;width:310px;padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 15px 35px rgba(53,45,74,.14);font-size:.72rem;color:#6d687a;line-height:1.7;opacity:0;pointer-events:none;transform:translateY(-4px);transition:.15s;z-index:60}.header-help-panel strong{color:var(--text);font-size:.82rem}.header-help-panel p{margin:6px 0}.header-help-panel ul{margin:6px 0 0;padding-left:18px}.header-help-panel code{padding:1px 4px;border-radius:4px;background:var(--accent-soft);color:var(--accent-dark)}.header-help-wrap.open .header-help-panel{opacity:1;pointer-events:auto;transform:none}.thread-clear{margin-left:auto;padding:5px 9px;font-size:.66rem}.option-title{display:flex;align-items:center;gap:8px}.thread-controls{row-gap:8px}.thread-live-sync{margin:0!important}.thread-tools .thread-empty{min-height:48px;display:flex;align-items:center}.thread-tools .thread-edit{min-height:115px}
+    @media(max-width:600px){.header-help-panel{position:fixed;top:58px;right:12px;left:12px;width:auto}.thread-clear{margin-left:auto}.thread-controls .check-row{width:auto}}
+  `;
+  document.head.appendChild(style);
+
   const brand = $('.brand');
   if (brand && !$('#headerHelp')) {
     const wrap = document.createElement('div');
@@ -63,12 +70,7 @@
     title.appendChild(b);
     b.addEventListener('click', () => {
       const preview = $('#threadPreview');
-      const remove = () => {
-        const del = $('.thread-delete', preview);
-        if (del) { del.click(); requestAnimationFrame(remove); return; }
-        $('#addThreadPost')?.click();
-        window.showMessage?.('SNS投稿エディターをクリアしました');
-      };
+      const remove = () => { const del = $('.thread-delete', preview); if (del) { del.click(); requestAnimationFrame(remove); return; } $('#addThreadPost')?.click(); window.showMessage?.('SNS投稿エディターをクリアしました'); };
       remove();
     });
   }
