@@ -35,7 +35,7 @@
   </div>
   <aside class="stats-panel panel">
     <div class="panel-heading"><div><span class="panel-kicker">ANALYSIS</span><h3>文字数チェック</h3></div></div>
-    <div class="target-box">
+    <div class="target-box"><div class="sns-inline-note">SNS投稿の文字数上限は「SNSモード」で設定できます。分割すると、この文章欄のすぐ下でPOSTごとに編集できます。</div>
       <div class="target-top"><label for="targetCount">目標文字数</label><div class="target-input-wrap"><input id="targetCount" type="number" min="0" max="999999" value="140" inputmode="numeric"><span>文字</span></div></div><div class="sns-row"><label for="snsMode">SNSモード</label><select id="snsMode"><option value="">カスタム</option><option value="x">X / 280</option><option value="xjp">X / 日本語目安 140</option><option value="xlong">X Premium / 長文 25,000</option><option value="bluesky">Bluesky / 300</option><option value="instagram">Instagram / 2,200</option><option value="threads">Threads / 500</option></select></div>
       <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
       <div class="progress-meta"><span id="progressText">あと 140 文字</span><span id="progressPercent">0%</span></div>
@@ -50,10 +50,22 @@
     </div>
   </aside>
 </section>
+  <div class="option-box thread-tools" id="thread-tools">
+  <div class="option-title">SNS投稿エディター</div>
+  <div class="thread-controls">
+    <label>1投稿 <input id="splitLimit" type="number" min="1" max="25000" value="140"> 文字</label>
+    <label class="check-row"><input id="splitPreferLines" type="checkbox" checked> 文の途中で切らない</label>
+    <label class="thread-method">分割方法 <select id="splitMethod"><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label>
+    <button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
+  </div>
+  <div class="thread-help">自動分割は初期案です。POSTごとに自由に編集でき、投稿の追加・削除・並べ替えもできます。</div>
+  <div class="thread-preview" id="threadPreview"></div>
+  <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">本文に反映</button></div>
+</div>
 <section class="tools-section selection-tools" id="selection-tools">
   <div class="section-heading"><div><span class="panel-kicker">SELECTION</span><h3>範囲選択ツール</h3></div><p>範囲を選ぶと、下の変換・整形もすべて選択部分だけに適用できます。</p></div>
-  <div class="selection-status" id="selectionStatus">文章をドラッグして範囲を選択してください。</div>
-  <div class="selection-mode"><span>現在の対象</span><strong id="scopeModeLabel">全文</strong><small>範囲選択中は自動で「選択範囲」に切り替わります。</small></div>
+  <div class="selection-status" id="selectionStatus">0文字</div>
+  <div class="selection-mode"><span>現在の対象</span><strong id="scopeModeLabel">未選択</strong><small>範囲選択中のみ詳細ツールを表示します。</small></div>
   <div class="selection-actions">
     <button class="secondary-button selection-action" data-selection-action="spaces" type="button">空白整理</button>
     <button class="secondary-button selection-action" data-selection-action="linebreaks" type="button">改行整理</button>
@@ -92,18 +104,7 @@
   </div>
   <div class="option-box"><div class="option-title">改行オプション</div><div class="option-grid"><label><input type="radio" name="lineMode" value="keep" checked>変更しない</label><label><input type="radio" name="lineMode" value="join">改行をすべて削除</label><label><input type="radio" name="lineMode" value="single">連続改行を1つに</label><label><input type="radio" name="lineMode" value="blank">空白行を削除</label><label><input type="radio" name="lineMode" value="double">空行1つまでに整理</label><label><input type="radio" name="lineMode" value="char">1文字ずつ改行</label></div><button class="secondary-button" id="applyLineMode" type="button">改行設定を適用</button></div>
   <div class="option-box"><div class="option-title">よく使う変換</div><div class="preset-grid"><button class="preset-button" data-preset="asteriskBullet" type="button"><b>* → ・</b><small>Markdown風箇条書き</small></button><button class="preset-button" data-preset="dashBullet" type="button"><b>- → ・</b><small>ハイフン箇条書き</small></button><button class="preset-button" data-preset="plusBullet" type="button"><b>+ → ・</b><small>プラス箇条書き</small></button><button class="preset-button" data-preset="sentenceBreaks" type="button"><b>文ごとに改行</b><small>。！？の後で分割</small></button><button class="preset-button" data-preset="trimLines" type="button"><b>行頭・行末整理</b><small>全行をトリミング</small></button><button class="preset-button" data-preset="spaces" type="button"><b>空白整理</b><small>余分な空白を削除</small></button></div></div><div class="option-box" id="conversion-tools"><div class="option-title">変換・置換</div><div class="conversion-grid"><select id="conversionType"><option value="hiragana">全角カタカナ → ひらがな</option><option value="katakana">ひらがな → 全角カタカナ</option><option value="halfKatakana">全角カタカナ → 半角カタカナ</option><option value="fullKatakana">半角カタカナ → 全角カタカナ</option><option value="lower">英字 → 小文字</option><option value="upper">英字 → 大文字</option><option value="numberHalf">数字 → 半角</option><option value="numberFull">数字 → 全角</option><option value="symbolHalf">記号 → 半角</option><option value="symbolFull">記号 → 全角</option></select><button class="secondary-button" id="applyConversion" type="button">変換する</button></div><div class="replace-row"><input id="replaceFrom" type="text" placeholder="検索する文字列"><span>→</span><input id="replaceTo" type="text" placeholder="置換後"><button class="secondary-button" id="replaceButton" type="button">置換</button></div><div class="replace-options"><label class="check-row"><input id="regexMode" type="checkbox"> 正規表現で検索する</label><label class="scope-label">対象<select id="replaceScope"><option value="all">全文</option><option value="selection">選択範囲</option></select></label></div><div class="regex-hint">例：<code>^</code> 行頭 / <code>$</code> 行末 / <code>\d+</code> 数字 / <code>\s+</code> 空白 / <code>.*</code> 任意文字列</div></div>
-  <div class="option-box thread-tools" id="thread-tools">
-  <div class="option-title">SNS投稿エディター</div>
-  <div class="thread-controls">
-    <label>1投稿 <input id="splitLimit" type="number" min="1" max="25000" value="140"> 文字</label>
-    <label class="check-row"><input id="splitPreferLines" type="checkbox" checked> 文の途中で切らない</label>
-    <label class="thread-method">分割方法 <select id="splitMethod"><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label>
-    <button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
-  </div>
-  <div class="thread-help">自動分割は初期案です。POSTごとに自由に編集でき、投稿の追加・削除・並べ替えもできます。</div>
-  <div class="thread-preview" id="threadPreview"></div>
-  <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">本文に反映</button></div>
-</div><div class="option-box" id="file-tools"><div class="option-title">ファイル</div><div class="file-row"><label class="file-button">📂 ファイルを読み込む<input id="fileInput" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv"></label><button class="secondary-button" id="saveButton" type="button">💾 TXTで保存</button></div></div>
+<div class="option-box" id="file-tools"><div class="option-title">ファイル</div><div class="file-row"><label class="file-button">📂 ファイルを読み込む<input id="fileInput" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv"></label><button class="secondary-button" id="saveButton" type="button">💾 TXTで保存</button></div></div>
   <div class="action-row"><button class="secondary-button" id="extractUrls" type="button">🔗 URLを抽出</button><button class="secondary-button" id="formatBullets" type="button">• 箇条書きを整える</button><button class="secondary-button" id="addBullets" type="button">・ 行頭に追加</button><button class="primary-button" id="copyButton" type="button">コピーする</button></div>
   <div class="message" id="message" role="status" aria-live="polite"></div>
 </section>
