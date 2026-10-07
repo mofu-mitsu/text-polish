@@ -11,7 +11,7 @@
 <body>
 <header class="site-header">
   <div class="brand"><span class="brand-mark">T</span><div><h1>Text Polish</h1><p>文章を整えて、数えて、仕上げる。</p></div></div>
-  <div class="header-actions"><button class="ghost-button" id="sampleButton" type="button">サンプル</button><button class="ghost-button" id="clearButton" type="button">クリア</button></div>
+  <div class="header-actions"><button class="icon-button" id="undoButton" type="button" title="元に戻す" aria-label="元に戻す" disabled>↶</button><button class="icon-button" id="redoButton" type="button" title="やり直す" aria-label="やり直す" disabled>↷</button><button class="ghost-button" id="sampleButton" type="button">サンプル</button><button class="ghost-button" id="clearButton" type="button">クリア</button></div>
 </header>
 <main class="app-shell">
 <section class="hero"><div><span class="eyebrow">TEXT WORKBENCH</span><h2>書いた文章を、<span>投稿できる状態</span>まで。</h2><p>文字数を確認しながら、空白・改行・表記をまとめて整えられます。</p></div><div class="hero-badge"><strong id="heroCount">0</strong><span>characters</span></div></section>
@@ -24,12 +24,13 @@
   <aside class="stats-panel panel">
     <div class="panel-heading"><div><span class="panel-kicker">ANALYSIS</span><h3>文字数チェック</h3></div></div>
     <div class="target-box">
-      <div class="target-top"><label for="targetCount">目標文字数</label><div class="target-input-wrap"><input id="targetCount" type="number" min="0" max="999999" value="140" inputmode="numeric"><span>文字</span></div></div>
+      <div class="target-top"><label for="targetCount">目標文字数</label><div class="target-input-wrap"><input id="targetCount" type="number" min="0" max="999999" value="140" inputmode="numeric"><span>文字</span></div></div><div class="sns-row"><label for="snsMode">SNSモード</label><select id="snsMode"><option value="">カスタム</option><option value="x">X / 280</option><option value="xjp">X / 日本語目安 140</option><option value="xlong">X Premium / 長文 25,000</option><option value="bluesky">Bluesky / 300</option><option value="instagram">Instagram / 2,200</option><option value="threads">Threads / 500</option></select></div>
       <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
       <div class="progress-meta"><span id="progressText">あと 140 文字</span><span id="progressPercent">0%</span></div>
     </div>
     <div class="primary-stat"><span>文字数</span><strong id="charCount">0</strong></div>
     <div class="stat-grid">
+      <div class="stat"><span>改行・空白込み</span><strong id="charCountIncluded">0</strong></div><div class="stat"><span>改行・空白除外</span><strong id="charCountExcluded">0</strong></div>
       <div class="stat"><span>URL除外</span><strong id="urlExcludedCount">0</strong></div><div class="stat"><span>改行</span><strong id="lineBreakCount">0</strong></div>
       <div class="stat"><span>空白</span><strong id="spaceCount">0</strong></div><div class="stat"><span>日本語</span><strong id="japaneseCount">0</strong></div>
       <div class="stat"><span>英字</span><strong id="alphaCount">0</strong></div><div class="stat"><span>数字</span><strong id="numberCount">0</strong></div>
@@ -41,16 +42,19 @@
   <div class="section-heading"><div><span class="panel-kicker">POLISH</span><h3>文章を整える</h3></div><p>選んだ処理を一括適用できます。</p></div>
   <div class="tool-grid">
     <button class="tool-button" data-action="spaces" type="button"><span class="tool-icon">↔</span><span><b>余分な空白を削除</b><small>連続スペース・行頭末を整理</small></span></button>
-    <button class="tool-button" data-action="linebreaks" type="button"><span class="tool-icon">↵</span><span><b>改行を整理</b><small>3行以上の連続改行を2行に</small></span></button>
+    <button class="tool-button" data-action="linebreaks" type="button"><span class="tool-icon">↵</span><span><b>改行を整理</b><small>下の設定で細かく指定</small></span></button>
     <button class="tool-button" data-action="width" type="button"><span class="tool-icon">Ａ</span><span><b>全角・半角を統一</b><small>英数字・記号を半角へ</small></span></button>
-    <button class="tool-button" data-action="punctuation" type="button"><span class="tool-icon">。</span><span><b>句読点を統一</b><small>「, .」を「、。」へ</small></span></button>
+    <button class="tool-button" data-action="punctuation" type="button"><span class="tool-icon">。</span><span><b>句読点を統一</b><small>URL・ドメインは保護</small></span></button>
     <button class="tool-button" data-action="quotes" type="button"><span class="tool-icon">“”</span><span><b>括弧・引用符を統一</b><small>引用符を日本語向けに</small></span></button>
-    <button class="tool-button" data-action="trim" type="button"><span class="tool-icon">⌫</span><span><b>前後をトリミング</b><small>文章の先頭・末尾の空白を削除</small></span></button>
+    <button class="tool-button" data-action="trimLines" type="button"><span class="tool-icon">⌫</span><span><b>行頭・行末をトリミング</b><small>すべての行を対象</small></span></button>
   </div>
-  <div class="action-row"><button class="secondary-button" id="extractUrls" type="button">🔗 URLを抽出</button><button class="secondary-button" id="formatBullets" type="button">• 箇条書きを整える</button><button class="primary-button" id="copyButton" type="button">コピーする</button></div>
+  <div class="option-box"><div class="option-title">改行オプション</div><div class="option-grid"><label><input type="radio" name="lineMode" value="keep" checked>変更しない</label><label><input type="radio" name="lineMode" value="join">改行をすべて削除</label><label><input type="radio" name="lineMode" value="single">連続改行を1つに</label><label><input type="radio" name="lineMode" value="blank">空白行を削除</label><label><input type="radio" name="lineMode" value="double">空行1つまでに整理</label><label><input type="radio" name="lineMode" value="char">1文字ずつ改行</label></div><button class="secondary-button" id="applyLineMode" type="button">改行設定を適用</button></div>
+  <div class="option-box"><div class="option-title">変換・置換</div><div class="conversion-grid"><select id="conversionType"><option value="hiragana">全角カタカナ → ひらがな</option><option value="katakana">ひらがな → 全角カタカナ</option><option value="halfKatakana">全角カタカナ → 半角カタカナ</option><option value="fullKatakana">半角カタカナ → 全角カタカナ</option><option value="lower">英字 → 小文字</option><option value="upper">英字 → 大文字</option><option value="numberHalf">数字 → 半角</option><option value="numberFull">数字 → 全角</option><option value="symbolHalf">記号 → 半角</option><option value="symbolFull">記号 → 全角</option></select><button class="secondary-button" id="applyConversion" type="button">変換する</button></div><div class="replace-row"><input id="replaceFrom" type="text" placeholder="検索する文字列"><span>→</span><input id="replaceTo" type="text" placeholder="置換後"><button class="secondary-button" id="replaceButton" type="button">置換</button></div><label class="check-row"><input id="regexMode" type="checkbox"> 正規表現で検索する</label><div class="regex-hint">例：<code>^</code> 行頭 / <code>$</code> 行末 / <code>\d+</code> 数字 / <code>\s+</code> 空白 / <code>.*</code> 任意文字列</div></div>
+  <div class="option-box"><div class="option-title">ファイル</div><div class="file-row"><label class="file-button">📂 ファイルを読み込む<input id="fileInput" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv"></label><button class="secondary-button" id="saveButton" type="button">💾 TXTで保存</button></div></div>
+  <div class="action-row"><button class="secondary-button" id="extractUrls" type="button">🔗 URLを抽出</button><button class="secondary-button" id="formatBullets" type="button">• 箇条書きを整える</button><button class="secondary-button" id="addBullets" type="button">・ 行頭に追加</button><button class="primary-button" id="copyButton" type="button">コピーする</button></div>
   <div class="message" id="message" role="status" aria-live="polite"></div>
 </section>
-<section class="details-section"><details><summary>カウント仕様について</summary><ul><li>文字数はJavaScriptのUnicodeコードポイント単位で数えます。</li><li>URL除外は http / https / www から始まるURLを除いて数えます。</li><li>絵文字はUnicodeの絵文字シーケンスをできるだけ1単位として数えます。</li><li>改行は改行文字の数です。空白にはスペース・タブなどを含みます。</li></ul></details></section>
+<section class="details-section"><details><summary>カウント・変換仕様について</summary><ul><li>文字数はUnicodeコードポイント単位。空白・改行を除外した文字数も表示します。</li><li>URL除外は http / https / www から始まるURLを対象にし、句読点変換でもURL部分を保護します。</li><li>行頭・行末のトリミングはすべての行に適用します。</li><li>正規表現置換はJavaScriptの正規表現を利用します。</li></ul></details></section>
 </main>
 <footer class="site-footer"><span>Text Polish</span><span>入力内容はブラウザ内だけで処理されます。</span></footer>
 <script src="script.js"></script>
