@@ -77,9 +77,12 @@ document.querySelectorAll(".quick-tab").forEach(tab=>{
   tab.addEventListener("touchstart",()=>{clearTimeout(qtTimer);qtTimer=setTimeout(()=>showQuickDetail(tab),550)},{passive:true});
   tab.addEventListener("touchend",()=>clearTimeout(qtTimer));
 });
-drag.addEventListener("pointerdown",e=>{qtDrag=true;const r=qt.getBoundingClientRect();qtDX=e.clientX-r.left;qtDY=e.clientY-r.top;qt.style.left=r.left+"px";qt.style.top=r.top+"px";qt.style.transform="none";drag.setPointerCapture(e.pointerId)});
-drag.addEventListener("pointermove",e=>{if(!qtDrag)return;qt.style.left=Math.max(4,Math.min(innerWidth-qt.offsetWidth-4,e.clientX-qtDX))+"px";qt.style.top=Math.max(4,Math.min(innerHeight-qt.offsetHeight-4,e.clientY-qtDY))+"px"});
-drag.addEventListener("pointerup",()=>{qtDrag=false;localStorage.setItem("textPolishToolbar",JSON.stringify({left:qt.style.left,top:qt.style.top}))});
+drag.addEventListener("pointerdown",e=>{e.preventDefault();qtDrag=true;const r=qt.getBoundingClientRect();qtDX=e.clientX-r.left;qtDY=e.clientY-r.top;qt.style.left=r.left+"px";qt.style.right="auto";qt.style.top=r.top+"px";qt.style.transform="none";try{drag.setPointerCapture(e.pointerId)}catch{}});
+drag.addEventListener("pointermove",e=>{if(!qtDrag)return;e.preventDefault();qt.style.left=Math.max(4,Math.min(innerWidth-qt.offsetWidth-4,e.clientX-qtDX))+"px";qt.style.top=Math.max(4,Math.min(innerHeight-qt.offsetHeight-4,e.clientY-qtDY))+"px"});
+const finishQtDrag=()=>{if(!qtDrag)return;qtDrag=false;localStorage.setItem("textPolishToolbar",JSON.stringify({left:qt.style.left,top:qt.style.top}))};
+drag.addEventListener("pointerup",finishQtDrag);
+drag.addEventListener("pointercancel",finishQtDrag);
+drag.addEventListener("lostpointercapture",finishQtDrag);
 collapse.addEventListener("click",()=>{qt.classList.toggle("collapsed");collapse.textContent=qt.classList.contains("collapsed")?"›":"‹";localStorage.setItem("textPolishToolbarCollapsed",qt.classList.contains("collapsed"))});
 try{const p=JSON.parse(localStorage.getItem("textPolishToolbar")||"null");if(p){qt.style.left=p.left;qt.style.top=p.top;qt.style.transform="none"}if(localStorage.getItem("textPolishToolbarCollapsed")==="true"){qt.classList.add("collapsed");collapse.textContent="›"}}catch{}
 
