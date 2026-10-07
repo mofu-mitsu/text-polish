@@ -23,7 +23,7 @@ function normalizeLineBreaks(t){return t.replace(/\r\n?/g,"\n").replace(/\n{3,}/
 function normalizeWidth(t){return t.replace(/[！-～]/g,c=>{const a=String.fromCharCode(c.charCodeAt(0)-0xfee0);return /[A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\]^_{}|~]/.test(a)?a:c}).replace(/　/g," ")}
 function protectUrls(text,fn){const urls=[];const masked=text.replace(URL_RE,u=>{const key="__TP_URL_"+urls.length+"__";urls.push(u);return key});return fn(masked).replace(/__TP_URL_(\d+)__/g,(_,i)=>urls[Number(i)])}
 function normalizePunctuation(t){return protectUrls(t,s=>s.replace(/[,.!?:;]/g,c=>PUNCTUATION_MAP[c]||c))}
-function sentenceBreaks(t){return protectUrls(t,s=>s.replace(/([。！？!?])([」』）】》〉〕］"\']*)[ \\t]*/gu,"$1$2\n")).replace(/\n{2,}/g,"\n")}
+function sentenceBreaks(t){return protectUrls(t,s=>{const a=Array.from(s);return a.reduce((out,c,i)=>{out+=c;if("。！？!?".includes(c)&&a[i+1]!==undefined&&a[i+1]!=="\n")out+="\n";return out;},"").replace(/\n{2,}/g,"\n")})}
 function applySelection(fn,label){const start=input.selectionStart,end=input.selectionEnd;if(start===end)return null;const part=input.value.slice(start,end),changed=fn(part);if(changed===part)return label;setText(input.value.slice(0,start)+changed+input.value.slice(end),label);requestAnimationFrame(()=>{input.focus();input.setSelectionRange(start,start+changed.length);updateSelectionUI()});return label}
 function selectionTransform(fn,label){return applySelection(fn,label)}
 function applyScoped(fn,label){return applySelection(fn,label)||setText(fn(input.value),label)}
