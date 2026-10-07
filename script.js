@@ -13,23 +13,6 @@ function render(){const text=input.value,stats=getStats(text),target=Math.max(0,
 function showMessage(t){message.textContent=t;clearTimeout(showMessage.timer);showMessage.timer=setTimeout(()=>message.textContent="",2400)}
 function pushUndo(value){undoStack.push(value);if(undoStack.length>100)undoStack.shift();redoStack=[];lastCommitted=input.value;updateHistoryButtons()}
 function setText(t,n){if(t===input.value){if(n)showMessage(n);return}pushUndo(input.value);suppressHistory=true;input.value=t;suppressHistory=false;lastCommitted=t;
-// --- Floating quick toolbar ---
-const qt=$("#quickToolbar"),drag=$("#quickDrag"),collapse=$("#quickCollapse"),detail=$("#quickDetail");
-let qtDrag=false,qtDX=0,qtDY=0,qtTimer;
-function showQuickDetail(tab){if(!detail)return;detail.textContent=tab.dataset.detail||"";detail.classList.add("show")}
-function hideQuickDetail(){if(detail)detail.classList.remove("show")}
-document.querySelectorAll(".quick-tab").forEach(tab=>{
-  tab.addEventListener("mouseenter",()=>showQuickDetail(tab));
-  tab.addEventListener("mouseleave",hideQuickDetail);
-  tab.addEventListener("touchstart",()=>{clearTimeout(qtTimer);qtTimer=setTimeout(()=>showQuickDetail(tab),550)},{passive:true});
-  tab.addEventListener("touchend",()=>clearTimeout(qtTimer));
-});
-drag.addEventListener("pointerdown",e=>{qtDrag=true;const r=qt.getBoundingClientRect();qtDX=e.clientX-r.left;qtDY=e.clientY-r.top;qt.style.left=r.left+"px";qt.style.top=r.top+"px";qt.style.transform="none";drag.setPointerCapture(e.pointerId)});
-drag.addEventListener("pointermove",e=>{if(!qtDrag)return;qt.style.left=Math.max(4,Math.min(innerWidth-qt.offsetWidth-4,e.clientX-qtDX))+"px";qt.style.top=Math.max(4,Math.min(innerHeight-qt.offsetHeight-4,e.clientY-qtDY))+"px"});
-drag.addEventListener("pointerup",()=>{qtDrag=false;localStorage.setItem("textPolishToolbar",JSON.stringify({left:qt.style.left,top:qt.style.top}))});
-collapse.addEventListener("click",()=>{qt.classList.toggle("collapsed");collapse.textContent=qt.classList.contains("collapsed")?"›":"‹";localStorage.setItem("textPolishToolbarCollapsed",qt.classList.contains("collapsed"))});
-try{const p=JSON.parse(localStorage.getItem("textPolishToolbar")||"null");if(p){qt.style.left=p.left;qt.style.top=p.top;qt.style.transform="none"}if(localStorage.getItem("textPolishToolbarCollapsed")==="true"){qt.classList.add("collapsed");collapse.textContent="›"}}catch{}
-
 render();if(n)showMessage(n);input.focus()}
 function updateHistoryButtons(){$("#undoButton").disabled=undoStack.length===0;$("#redoButton").disabled=redoStack.length===0}
 function undo(){if(!undoStack.length)return;redoStack.push(input.value);input.value=undoStack.pop();lastCommitted=input.value;render();showMessage("元に戻しました")}
@@ -42,6 +25,7 @@ function protectUrls(text,fn){const urls=[];const masked=text.replace(URL_RE,u=>
 function normalizePunctuation(t){return protectUrls(t,s=>s.replace(/[,.!?:;]/g,c=>PUNCTUATION_MAP[c]||c))}
 function sentenceBreaks(t){return protectUrls(t,s=>s.replace(/([。！？!?])([」』）】》〉〕］"']*)[ \\t]*/gu,"$1$2\\n")).replace(/\\n{2,}/g,"\\n")}
 function applySelection(fn,label){const start=input.selectionStart,end=input.selectionEnd;if(start===end)return null;const part=input.value.slice(start,end),changed=fn(part);if(changed===part)return label;setText(input.value.slice(0,start)+changed+input.value.slice(end),label);requestAnimationFrame(()=>{input.focus();input.setSelectionRange(start,start+changed.length);updateSelectionUI()});return label}
+function selectionTransform(fn,label){return applySelection(fn,label)}
 function applyScoped(fn,label){return applySelection(fn,label)||setText(fn(input.value),label)}
 function scopedAction(fn,label){if(input.selectionStart!==input.selectionEnd)applySelection(fn,label);else setText(fn(input.value),label)}
 function splitText(t,limit,preferLines,method){const chars=Array.from(t);if(!t)return[];if(method==="manual")return t.split(/\\r?\\n/).filter((_,i,a)=>a.length===1||i<a.length).map(x=>x);const out=[];let pos=0;while(pos<chars.length){let end=Math.min(pos+limit,chars.length);if(end<chars.length&&(preferLines||method==="line")){const chunk=chars.slice(pos,end).join(""),marks=[...chunk.matchAll(/\\n|[。！？!?](?:[」』）】》〉〕］"']*)/gu)];if(marks.length){const m=marks[marks.length-1],cut=m[0]==="\\n"?m.index+1:m.index+m[0].length;if(cut>Math.floor(limit*.55))end=pos+Array.from(chunk.slice(0,cut)).length}}out.push(chars.slice(pos,end).join(""));pos=end}return out}
@@ -68,7 +52,7 @@ $("#snsMode").addEventListener("change",()=>{const v=$("#snsMode").value;if(v){t
 $("#undoButton").addEventListener("click",undo);$("#redoButton").addEventListener("click",redo);
 $("#applyLineMode").addEventListener("click",()=>{const mode=document.querySelector('input[name="lineMode"]:checked').value;scopedAction(t=>applyLineMode(t,mode),"改行設定を適用しました")});
 $("#applyConversion").addEventListener("click",()=>scopedAction(t=>convertText(t,$("#conversionType").value),"変換しました"));
-$("#replaceButton").addEventListener("click",()=>{const from=$("#replaceFrom").value,to=$("#replaceTo").value,regex=$("#regexMode").checked,scope=$("#replaceScope").value;if(!from)return showMessage("検索する文字列を入力してください");try{const pattern=regex?new RegExp(from,"gu"):new RegExp(from.replace(/[.*+?^$()|[\]\\]/g,"\\$&"),"gu");if(scope==="selection"){const start=input.selectionStart,end=input.selectionEnd;if(start===end)return showMessage("置換する範囲を選択してください");const part=input.value.slice(start,end),changed=part.replace(pattern,to);setText(input.value.slice(0,start)+changed+input.value.slice(end),regex?"選択範囲を正規表現で置換しました":"選択範囲を置換しました")}else setText(input.value.replace(pattern,to),regex?"正規表現で置換しました":"文字列を置換しました")}catch(e){showMessage("正規表現が正しくありません")}});
+$("#replaceButton").addEventListener("click",()=>{const from=$("#replaceFrom").value,to=$("#replaceTo").value,regex=$("#regexMode").checked,scope=input.selectionStart!==input.selectionEnd?"selection":$("#replaceScope").value;if(!from)return showMessage("検索する文字列を入力してください");try{const pattern=regex?new RegExp(from,"gu"):new RegExp(from.replace(/[.*+?^$()|[\]\\]/g,"\\$&"),"gu");if(scope==="selection"){const start=input.selectionStart,end=input.selectionEnd;if(start===end)return showMessage("置換する範囲を選択してください");const part=input.value.slice(start,end),changed=part.replace(pattern,to);setText(input.value.slice(0,start)+changed+input.value.slice(end),regex?"選択範囲を正規表現で置換しました":"選択範囲を置換しました")}else setText(input.value.replace(pattern,to),regex?"正規表現で置換しました":"文字列を置換しました")}catch(e){showMessage("正規表現が正しくありません")}});
 $("#copyButton").addEventListener("click",async()=>{if(!input.value)return showMessage("コピーする文章がありません");try{await navigator.clipboard.writeText(input.value);showMessage("文章をクリップボードにコピーしました")}catch{input.select();document.execCommand("copy");input.setSelectionRange(input.value.length,input.value.length);showMessage("文章をコピーしました")}});
 $("#extractUrls").addEventListener("click",()=>scopedAction(t=>{const urls=t.match(URL_RE)||[];return urls.join("\n")}, "URLを抽出しました"));
 $("#formatBullets").addEventListener("click",()=>scopedAction(formatBullets,"箇条書きを整えました"));
@@ -77,4 +61,23 @@ $("#clearButton").addEventListener("click",()=>setText("","入力内容をクリ
 $("#sampleButton").addEventListener("click",()=>setText("Text Polishのサンプル文章です。  余分な空白や\n\n\n連続した改行を整理して、文字数も確認できます。\nhttps://example.com/sample","サンプル文章を入力しました"));
 $("#fileInput").addEventListener("change",e=>{const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>setText(String(reader.result||""),file.name+"を読み込みました");reader.readAsText(file,"UTF-8")});
 $("#saveButton").addEventListener("click",()=>{if(!input.value)return showMessage("保存する文章がありません");const blob=new Blob([input.value],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="text-polish.txt";a.click();URL.revokeObjectURL(url);showMessage("TXTファイルを保存しました")});
+// --- Floating quick toolbar ---
+const qt=$("#quickToolbar"),drag=$("#quickDrag"),collapse=$("#quickCollapse"),detail=$("#quickDetail");
+let qtDrag=false,qtDX=0,qtDY=0,qtTimer;
+function updateSelectionUI(){const start=input.selectionStart,end=input.selectionEnd,has=start!==end,status=$("#selectionStatus"),scope=$("#scopeModeLabel");if(status){status.textContent=has?"選択中："+Array.from(input.value.slice(start,end)).length+"文字":"文章をドラッグして範囲を選択してください。";status.classList.toggle("has-selection",has)}if(scope)scope.textContent=has?"選択範囲":"全文";document.querySelectorAll(".selection-action").forEach(b=>b.disabled=!has)}["select","keyup","mouseup","touchend","input"].forEach(ev=>input.addEventListener(ev,updateSelectionUI));document.querySelectorAll(".quick-tab").forEach(tab=>tab.addEventListener("click",()=>{document.querySelectorAll(".quick-tab").forEach(x=>x.classList.remove("active"));tab.classList.add("active");document.getElementById(tab.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"})}));
+function showQuickDetail(tab){if(!detail)return;detail.textContent=tab.dataset.detail||"";detail.classList.add("show")}
+function hideQuickDetail(){if(detail)detail.classList.remove("show")}
+document.querySelectorAll(".quick-tab").forEach(tab=>{
+  tab.addEventListener("mouseenter",()=>showQuickDetail(tab));
+  tab.addEventListener("mouseleave",hideQuickDetail);
+  tab.addEventListener("touchstart",()=>{clearTimeout(qtTimer);qtTimer=setTimeout(()=>showQuickDetail(tab),550)},{passive:true});
+  tab.addEventListener("touchend",()=>clearTimeout(qtTimer));
+});
+drag.addEventListener("pointerdown",e=>{qtDrag=true;const r=qt.getBoundingClientRect();qtDX=e.clientX-r.left;qtDY=e.clientY-r.top;qt.style.left=r.left+"px";qt.style.top=r.top+"px";qt.style.transform="none";drag.setPointerCapture(e.pointerId)});
+drag.addEventListener("pointermove",e=>{if(!qtDrag)return;qt.style.left=Math.max(4,Math.min(innerWidth-qt.offsetWidth-4,e.clientX-qtDX))+"px";qt.style.top=Math.max(4,Math.min(innerHeight-qt.offsetHeight-4,e.clientY-qtDY))+"px"});
+drag.addEventListener("pointerup",()=>{qtDrag=false;localStorage.setItem("textPolishToolbar",JSON.stringify({left:qt.style.left,top:qt.style.top}))});
+collapse.addEventListener("click",()=>{qt.classList.toggle("collapsed");collapse.textContent=qt.classList.contains("collapsed")?"›":"‹";localStorage.setItem("textPolishToolbarCollapsed",qt.classList.contains("collapsed"))});
+try{const p=JSON.parse(localStorage.getItem("textPolishToolbar")||"null");if(p){qt.style.left=p.left;qt.style.top=p.top;qt.style.transform="none"}if(localStorage.getItem("textPolishToolbarCollapsed")==="true"){qt.classList.add("collapsed");collapse.textContent="›"}}catch{}
+
+
 render();
