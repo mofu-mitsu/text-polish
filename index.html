@@ -14,9 +14,7 @@
   <div class="header-actions"><button class="icon-button" id="undoButton" type="button" title="元に戻す" aria-label="元に戻す" disabled>↶</button><button class="icon-button" id="redoButton" type="button" title="やり直す" aria-label="やり直す" disabled>↷</button><button class="ghost-button" id="sampleButton" type="button">サンプル</button><button class="ghost-button" id="clearButton" type="button">クリア</button></div>
 </header>
 <div class="quick-toolbar" id="quickToolbar" aria-label="作業ツール">
-  <button class="quick-drag" id="quickDrag" type="button" aria-label="ツールバーを移動" title="ドラッグして移動">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h2v2H8V5Zm6 0h2v2h-2V5ZM8 11h2v2H8v-2Zm6 0h2v2h-2v-2ZM8 17h2v2H8v-2Zm6 0h2v2h-2v-2Z"/></svg>
-  </button>
+  <button class="quick-drag" id="quickDrag" type="button" aria-label="ツールバーを移動" title="ドラッグして移動"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h2v2H8V5Zm6 0h2v2h-2V5ZM8 11h2v2H8v-2Zm6 0h2v2h-2v-2ZM8 17h2v2H8v-2Zm6 0h2v2h-2v-2Z"/></svg></button>
   <button class="quick-tab active" data-jump="editor-panel" data-detail="文章入力・文字数確認。まずここから作業します。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5V20h2.5L18.7 7.8l-2.5-2.5L4 17.5Zm15.4-11.4a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-1.2 1.2 2.5 2.5 1.2-1.2Z"/></svg><span>編集</span></button>
   <button class="quick-tab" data-jump="selection-tools" data-detail="選択した部分だけを加工。変換・整形・置換を範囲限定で実行できます。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2H5V4Zm0 14h14v2H5v-2Zm0-7h14v2H5v-2Z"/></svg><span>範囲</span></button>
   <button class="quick-tab" data-jump="quick-tools" data-detail="空白・改行・句読点・箇条書きなど文章の基本整形。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-8 12h6l-1 8 8-12h-6l1-8Z"/></svg><span>整形</span></button>
@@ -25,7 +23,8 @@
   <button class="quick-tab" data-jump="file-tools" data-detail="TXTなどの読み込み・保存。" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h9l5 5v11H5V4Zm8 1.5V10h4.5L13 5.5ZM8 14h8v1.5H8V14Zm0 3h8v1.5H8V17Z"/></svg><span>ファイル</span></button>
   <button class="quick-collapse" id="quickCollapse" type="button" aria-label="ツールバーを折りたたむ" title="折りたたむ">‹</button>
   <div class="quick-detail" id="quickDetail" role="tooltip"></div>
-</div><main class="app-shell">
+</div>
+<main class="app-shell">
 <section class="hero"><div><span class="eyebrow">TEXT WORKBENCH</span><h2>書いた文章を、<span>投稿できる状態</span>まで。</h2><p>文字数を確認しながら、空白・改行・表記をまとめて整えられます。</p></div><div class="hero-badge"><strong id="heroCount">0</strong><span>characters</span></div></section>
 <section class="workspace">
   <div class="editor-panel panel" id="editor-panel">
@@ -50,15 +49,18 @@
     </div>
   </aside>
 </section>
-  <div class="option-box thread-tools" id="thread-tools">
-  <div class="option-title">SNS投稿エディター</div>
+<div class="option-box thread-tools" id="thread-tools">
+  <div class="option-title"><span>SNS投稿エディター</span><button class="thread-clear secondary-button" id="threadClear" type="button">クリア</button></div>
   <div class="thread-controls">
     <label>1投稿 <input id="splitLimit" type="number" min="1" max="25000" value="140"> 文字</label>
     <label class="check-row"><input id="splitPreferLines" type="checkbox" checked> 文の途中で切らない</label>
     <label class="thread-method">分割方法 <select id="splitMethod"><option value="smart">文字数＋文境界</option><option value="line">改行位置を優先</option><option value="manual">改行ごとに投稿</option></select></label>
     <button class="secondary-button" id="splitButton" type="button">投稿を作る</button>
+    <button class="secondary-button" id="insertDivider" type="button">分割線を挿入</button>
+    <button class="secondary-button" id="splitDividerButton" type="button">分割線で投稿を作る</button>
+    <label class="check-row thread-live-sync"><input id="threadLiveSync" type="checkbox"> 入力欄とPOST 1を同期</label>
   </div>
-  <div class="thread-help">自動分割は初期案です。POSTごとに自由に編集でき、投稿の追加・削除・並べ替えもできます。</div>
+  <div class="thread-help">基本は「ーーーー」のような分割線で投稿境界を決め、必要なら自動分割も使えます。POSTごとに編集・コピー・削除・並べ替えができます。</div>
   <div class="thread-preview" id="threadPreview"></div>
   <div class="thread-footer-actions"><button class="secondary-button" id="addThreadPost" type="button">＋ 投稿を追加</button><button class="secondary-button" id="applyThread" type="button">本文に反映</button></div>
 </div>
@@ -67,44 +69,21 @@
   <div class="selection-status" id="selectionStatus">0文字</div>
   <div class="selection-mode"><span>現在の対象</span><strong id="scopeModeLabel">未選択</strong><small>範囲選択中のみ詳細ツールを表示します。</small></div>
   <div class="selection-actions">
-    <button class="secondary-button selection-action" data-selection-action="spaces" type="button">空白整理</button>
-    <button class="secondary-button selection-action" data-selection-action="linebreaks" type="button">改行整理</button>
-    <button class="secondary-button selection-action" data-selection-action="sentenceBreaks" type="button">文ごと改行</button>
-    <button class="secondary-button selection-action" data-selection-action="join" type="button">改行を削除</button>
-    <button class="secondary-button selection-action" data-selection-action="punctuation" type="button">句読点</button>
-    <button class="secondary-button selection-action" data-selection-action="quotes" type="button">引用符</button>
-    <button class="secondary-button selection-action" data-selection-action="trimLines" type="button">行頭末整理</button>
-    <button class="secondary-button selection-action" data-selection-action="width" type="button">全角半角</button>
-    <button class="secondary-button selection-action" data-selection-action="asteriskBullet" type="button">* → ・</button>
-    <button class="secondary-button selection-action" data-selection-action="dashBullet" type="button">- → ・</button>
-    <button class="secondary-button selection-action" data-selection-action="plusBullet" type="button">+ → ・</button>
-    <button class="secondary-button selection-action" data-selection-action="formatBullets" type="button">箇条書き整理</button>
-    <button class="secondary-button selection-action" data-selection-action="addBullets" type="button">行頭に・</button>
-    <button class="secondary-button selection-action" data-selection-action="hiragana" type="button">ひらがな</button>
-    <button class="secondary-button selection-action" data-selection-action="katakana" type="button">カタカナ</button>
-    <button class="secondary-button selection-action" data-selection-action="halfKatakana" type="button">半角カナ</button>
-    <button class="secondary-button selection-action" data-selection-action="fullKatakana" type="button">全角カナ</button>
-    <button class="secondary-button selection-action" data-selection-action="lower" type="button">小文字</button>
-    <button class="secondary-button selection-action" data-selection-action="upper" type="button">大文字</button>
-    <button class="secondary-button selection-action" data-selection-action="numberHalf" type="button">数字半角</button>
-    <button class="secondary-button selection-action" data-selection-action="numberFull" type="button">数字全角</button>
-    <button class="secondary-button selection-action" data-selection-action="symbolHalf" type="button">記号半角</button>
-    <button class="secondary-button selection-action" data-selection-action="symbolFull" type="button">記号全角</button>
+    <button class="secondary-button selection-action" data-selection-action="spaces" type="button">空白整理</button><button class="secondary-button selection-action" data-selection-action="linebreaks" type="button">改行整理</button><button class="secondary-button selection-action" data-selection-action="sentenceBreaks" type="button">文ごと改行</button><button class="secondary-button selection-action" data-selection-action="join" type="button">改行を削除</button><button class="secondary-button selection-action" data-selection-action="punctuation" type="button">句読点</button><button class="secondary-button selection-action" data-selection-action="quotes" type="button">引用符</button><button class="secondary-button selection-action="trimLines" type="button">行頭末整理</button>
+    <button class="secondary-button selection-action" data-selection-action="width" type="button">全角半角</button><button class="secondary-button selection-action" data-selection-action="asteriskBullet" type="button">* → ・</button><button class="secondary-button selection-action" data-selection-action="dashBullet" type="button">- → ・</button><button class="secondary-button selection-action="plusBullet" type="button">+ → ・</button><button class="secondary-button selection-action" data-selection-action="formatBullets" type="button">箇条書き整理</button><button class="secondary-button selection-action" data-selection-action="addBullets" type="button">行頭に・</button>
+    <button class="secondary-button selection-action" data-selection-action="hiragana" type="button">ひらがな</button><button class="secondary-button selection-action" data-selection-action="katakana" type="button">カタカナ</button><button class="secondary-button selection-action" data-selection-action="halfKatakana" type="button">半角カナ</button><button class="secondary-button selection-action" data-selection-action="fullKatakana" type="button">全角カナ</button><button class="secondary-button selection-action" data-selection-action="lower" type="button">小文字</button><button class="secondary-button selection-action" data-selection-action="upper" type="button">大文字</button><button class="secondary-button selection-action" data-selection-action="numberHalf" type="button">数字半角</button><button class="secondary-button selection-action" data-selection-action="numberFull" type="button">数字全角</button><button class="secondary-button selection-action" data-selection-action="symbolHalf" type="button">記号半角</button><button class="secondary-button selection-action" data-selection-action="symbolFull" type="button">記号全角</button>
   </div>
   <div class="selection-note">※ テキストエリアの選択範囲を保持したまま加工します。処理後も変換後の範囲を選択状態にします。</div>
-</section><section class="tools-section" id="quick-tools">
+</section>
+<section class="tools-section" id="quick-tools">
   <div class="section-heading"><div><span class="panel-kicker">POLISH</span><h3>文章を整える</h3></div><p>選んだ処理を一括適用できます。</p></div>
   <div class="tool-grid">
-    <button class="tool-button" data-action="spaces" type="button"><span class="tool-icon">↔</span><span><b>余分な空白を削除</b><small>連続スペース・行頭末を整理</small></span></button>
-    <button class="tool-button" data-action="linebreaks" type="button"><span class="tool-icon">↵</span><span><b>改行を整理</b><small>下の設定で細かく指定</small></span></button>
-    <button class="tool-button" data-action="width" type="button"><span class="tool-icon">Ａ</span><span><b>全角・半角を統一</b><small>英数字・記号を半角へ</small></span></button>
-    <button class="tool-button" data-action="punctuation" type="button"><span class="tool-icon">。</span><span><b>句読点を統一</b><small>URL・ドメインは保護</small></span></button>
-    <button class="tool-button" data-action="quotes" type="button"><span class="tool-icon">“”</span><span><b>括弧・引用符を統一</b><small>引用符を日本語向けに</small></span></button>
-    <button class="tool-button" data-action="trimLines" type="button"><span class="tool-icon">⌫</span><span><b>行頭・行末をトリミング</b><small>すべての行を対象</small></span></button>
+    <button class="tool-button" data-action="spaces" type="button"><span class="tool-icon">↔</span><span><b>余分な空白を削除</b><small>連続スペース・行頭末を整理</small></span></button><button class="tool-button" data-action="linebreaks" type="button"><span class="tool-icon">↵</span><span><b>改行を整理</b><small>下の設定で細かく指定</small></span></button><button class="tool-button" data-action="width" type="button"><span class="tool-icon">Ａ</span><span><b>全角・半角を統一</b><small>英数字・記号を半角へ</small></span></button><button class="tool-button" data-action="punctuation" type="button"><span class="tool-icon">。</span><span><b>句読点を統一</b><small>URL・ドメインは保護</small></span></button><button class="tool-button" data-action="quotes" type="button"><span class="tool-icon">“”</span><span><b>括弧・引用符を統一</b><small>引用符を日本語向けに</small></span></button><button class="tool-button" data-action="trimLines" type="button"><span class="tool-icon">⌫</span><span><b>行頭・行末をトリミング</b><small>すべての行を対象</small></span></button>
   </div>
   <div class="option-box"><div class="option-title">改行オプション</div><div class="option-grid"><label><input type="radio" name="lineMode" value="keep" checked>変更しない</label><label><input type="radio" name="lineMode" value="join">改行をすべて削除</label><label><input type="radio" name="lineMode" value="single">連続改行を1つに</label><label><input type="radio" name="lineMode" value="blank">空白行を削除</label><label><input type="radio" name="lineMode" value="double">空行1つまでに整理</label><label><input type="radio" name="lineMode" value="char">1文字ずつ改行</label></div><button class="secondary-button" id="applyLineMode" type="button">改行設定を適用</button></div>
-  <div class="option-box"><div class="option-title">よく使う変換</div><div class="preset-grid"><button class="preset-button" data-preset="asteriskBullet" type="button"><b>* → ・</b><small>Markdown風箇条書き</small></button><button class="preset-button" data-preset="dashBullet" type="button"><b>- → ・</b><small>ハイフン箇条書き</small></button><button class="preset-button" data-preset="plusBullet" type="button"><b>+ → ・</b><small>プラス箇条書き</small></button><button class="preset-button" data-preset="sentenceBreaks" type="button"><b>文ごとに改行</b><small>。！？の後で分割</small></button><button class="preset-button" data-preset="trimLines" type="button"><b>行頭・行末整理</b><small>全行をトリミング</small></button><button class="preset-button" data-preset="spaces" type="button"><b>空白整理</b><small>余分な空白を削除</small></button></div></div><div class="option-box" id="conversion-tools"><div class="option-title">変換・置換</div><div class="conversion-grid"><select id="conversionType"><option value="hiragana">全角カタカナ → ひらがな</option><option value="katakana">ひらがな → 全角カタカナ</option><option value="halfKatakana">全角カタカナ → 半角カタカナ</option><option value="fullKatakana">半角カタカナ → 全角カタカナ</option><option value="lower">英字 → 小文字</option><option value="upper">英字 → 大文字</option><option value="numberHalf">数字 → 半角</option><option value="numberFull">数字 → 全角</option><option value="symbolHalf">記号 → 半角</option><option value="symbolFull">記号 → 全角</option></select><button class="secondary-button" id="applyConversion" type="button">変換する</button></div><div class="replace-row"><input id="replaceFrom" type="text" placeholder="検索する文字列"><span>→</span><input id="replaceTo" type="text" placeholder="置換後"><button class="secondary-button" id="replaceButton" type="button">置換</button></div><div class="replace-options"><label class="check-row"><input id="regexMode" type="checkbox"> 正規表現で検索する</label><label class="scope-label">対象<select id="replaceScope"><option value="all">全文</option><option value="selection">選択範囲</option></select></label></div><div class="regex-hint">例：<code>^</code> 行頭 / <code>$</code> 行末 / <code>\d+</code> 数字 / <code>\s+</code> 空白 / <code>.*</code> 任意文字列</div></div>
-<div class="option-box" id="file-tools"><div class="option-title">ファイル</div><div class="file-row"><label class="file-button">📂 ファイルを読み込む<input id="fileInput" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv"></label><button class="secondary-button" id="saveButton" type="button">💾 TXTで保存</button></div></div>
+  <div class="option-box"><div class="option-title">よく使う変換</div><div class="preset-grid"><button class="preset-button" data-preset="asteriskBullet" type="button"><b>* → ・</b><small>Markdown風箇条書き</small></button><button class="preset-button" data-preset="dashBullet" type="button"><b>- → ・</b><small>ハイフン箇条書き</small></button><button class="preset-button" data-preset="plusBullet" type="button"><b>+ → ・</b><small>プラス箇条書き</small></button><button class="preset-button" data-preset="sentenceBreaks" type="button"><b>文ごとに改行</b><small>。！？の後で分割</small></button><button class="preset-button" data-preset="trimLines" type="button"><b>行頭・行末整理</b><small>全行をトリミング</small></button><button class="preset-button" data-preset="spaces" type="button"><b>空白整理</b><small>余分な空白を削除</small></button></div></div>
+  <div class="option-box" id="conversion-tools"><div class="option-title">変換・置換</div><div class="conversion-grid"><select id="conversionType"><option value="hiragana">全角カタカナ → ひらがな</option><option value="katakana">ひらがな → 全角カタカナ</option><option value="halfKatakana">全角カタカナ → 半角カタカナ</option><option value="fullKatakana">半角カタカナ → 全角カタカナ</option><option value="lower">英字 → 小文字</option><option value="upper">英字 → 大文字</option><option value="numberHalf">数字 → 半角</option><option value="numberFull">数字 → 全角</option><option value="symbolHalf">記号 → 半角</option><option value="symbolFull">記号 → 全角</option></select><button class="secondary-button" id="applyConversion" type="button">変換する</button></div><div class="replace-row"><input id="replaceFrom" type="text" placeholder="検索する文字列"><span>→</span><input id="replaceTo" type="text" placeholder="置換後"><button class="secondary-button" id="replaceButton" type="button">置換</button></div><div class="replace-options"><label class="check-row"><input id="regexMode" type="checkbox"> 正規表現で検索する</label><label class="scope-label">対象<select id="replaceScope"><option value="all">全文</option><option value="selection">選択範囲</option></select></label></div><div class="regex-hint">例：<code>^</code> 行頭 / <code>$</code> 行末 / <code>\d+</code> 数字 / <code>\s+</code> 空白 / <code>.*</code> 任意文字列</div></div>
+  <div class="option-box" id="file-tools"><div class="option-title">ファイル</div><div class="file-row"><label class="file-button">📂 ファイルを読み込む<input id="fileInput" type="file" accept=".txt,.md,.csv,text/plain,text/markdown,text/csv"></label><button class="secondary-button" id="saveButton" type="button">💾 TXTで保存</button></div></div>
   <div class="action-row"><button class="secondary-button" id="extractUrls" type="button">🔗 URLを抽出</button><button class="secondary-button" id="formatBullets" type="button">• 箇条書きを整える</button><button class="secondary-button" id="addBullets" type="button">・ 行頭に追加</button><button class="primary-button" id="copyButton" type="button">コピーする</button></div>
   <div class="message" id="message" role="status" aria-live="polite"></div>
 </section>
@@ -112,5 +91,6 @@
 </main>
 <footer class="site-footer"><span>Text Polish</span><span>入力内容はブラウザ内だけで処理されます。</span></footer>
 <script src="script.js"></script>
+<script src="enhancements.js"></script>
 </body>
 </html>
