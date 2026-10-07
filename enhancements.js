@@ -17,8 +17,33 @@
   const quickDivider=$('#quickDivider');if(quickDivider&&!quickDivider.dataset.bound){quickDivider.dataset.bound='1';quickDivider.addEventListener('click',insertDivider)}
   const threadClear=$('#threadClear');if(threadClear&&!threadClear.dataset.bound){threadClear.dataset.bound='1';threadClear.addEventListener('click',()=>{const preview=$('#threadPreview');const remove=()=>{const del=$('.thread-delete',preview);if(del){del.click();requestAnimationFrame(remove);return}$('#addThreadPost')?.click();window.showMessage?.('SNS投稿エディターをクリアしました')};remove()})}
   requestAnimationFrame(()=>{const preview=$('#threadPreview');if(preview&&!$('.thread-edit',preview))$('#addThreadPost')?.click()});
-  const sync=()=>{if(!$('#threadLiveSync')?.checked)return;const first=$('.thread-edit',$('#threadPreview'));if(!first)return;const value=input.value;if(first.value!==value){first.value=value;first.dispatchEvent(new Event('input',{bubbles:true}))}};
-  input.addEventListener('input',sync);$('#threadLiveSync')?.addEventListener('change',()=>{if($('#threadLiveSync').checked){sync();window.showMessage?.('POST 1を入力欄と同期しました')}});
+  let syncing=false;
+  const syncAll=()=>{
+    if(!$('#threadLiveSync')?.checked||syncing)return;
+    syncing=true;
+    try{
+      if(typeof window.splitText==='function'&&typeof window.renderThreadEditor==='function'){
+        window.threadParts=window.splitText(input.value,Math.max(1,Number($('#splitLimit').value)||140),$('#splitPreferLines').checked,'divider');
+        window.renderThreadEditor();
+      }
+    }finally{syncing=false}
+  };
+  input.addEventListener('input',syncAll);
+  $('#threadLiveSync')?.addEventListener('change',()=>{
+    if($('#threadLiveSync').checked){
+      syncAll();
+      window.showMessage?.('入力欄とSNS投稿エディターを同期しました');
+    }
+  });
+  const previewSync=$('#threadPreview');
+  previewSync?.addEventListener('input',e=>{
+    if(!$('#threadLiveSync')?.checked||syncing||!e.target.classList.contains('thread-edit'))return;
+    const posts=[...previewSync.querySelectorAll('.thread-edit')].map(el=>el.value);
+    if(typeof window.setText==='function'){
+      syncing=true;
+      try{window.setText(posts.join('\\n__________________________________\\n'),'SNS投稿エディターの変更を入力欄に反映しました')}finally{syncing=false}
+    }
+  });
   $('#applyThread')?.addEventListener('click',()=>{const posts=[...document.querySelectorAll('.thread-edit')].map(el=>el.value);if(!posts.length)return window.showMessage?.('投稿を先に作成してください');if(typeof window.setText==='function')window.setText(posts.join('\n'),'SNS投稿を入力欄に反映しました')});
   ['insertDivider','splitDividerButton'].forEach(id=>document.getElementById(id)?.remove());
 })();
